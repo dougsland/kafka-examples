@@ -7,6 +7,7 @@ logging.basicConfig(level=logging.INFO)
 # Debug
 logging.info("Using BOOTSTRAP_SERVERS: %s" % (os.environ.get('BOOTSTRAP_SERVERS')))
 logging.info("Using SUBSCRIPTION_TOPICS: %s" % (os.environ.get('SUBSCRIPTION_TOPICS')))
+logging.info("Using GROUP_ID: %s" % (os.environ.get('GROUP_ID')))
 
 # Setup the Confluent Consumer
 c = Consumer({
