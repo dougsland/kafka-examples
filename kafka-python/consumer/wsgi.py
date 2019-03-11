@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import logging
-from kafka import KafkaConsumer
+#from kafka import KafkaConsumer
 logging.basicConfig(level=logging.INFO)
 
 # Debug
@@ -10,8 +10,8 @@ logging.info("Using CONSUME_TOPIC: %s" % (os.environ.get('CONSUME_TOPIC')))
 
 # Setup Consumer
 logging.info("Initiating Kafka connection for Consumer...")
-consumer = KafkaConsumer(os.environ.get('CONSUME_TOPIC'),
-						 bootstrap_servers=os.environ.get('BOOTSTRAP_SERVERS'))
+#consumer = KafkaConsumer(os.environ.get('CONSUME_TOPIC'),
+#						 bootstrap_servers=os.environ.get('BOOTSTRAP_SERVERS'))
 logging.info("Kafka consumer:")
 logging.info(consumer)
 
