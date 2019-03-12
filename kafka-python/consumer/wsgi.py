@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
         os.rename(
             "{tmpdir}/rhv_log_collector_analyzer.json".format(
-                 tempfile.gettempdir()),
+                 tmpdir=tempfile.gettempdir()),
             JSON_FILE
         )
 
