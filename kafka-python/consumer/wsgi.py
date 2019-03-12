@@ -3,11 +3,19 @@ import os
 import json
 import logging
 import requests
+import tarfile
 import tempfile
 
 from kafka import KafkaConsumer
 
 TAR_GZ = "rhv-log-collector-analyzer.tar.gz"
+
+
+def untar(fname):
+    tar = tarfile.open(fname)
+    tar.extractall()
+    tar.close()
+
 
 if __name__ == '__main__':
 
@@ -42,7 +50,7 @@ if __name__ == '__main__':
         except requests.exceptions.HTTPError as err:
             logging.exception(err)
 
-        fname = "{tmpdir}/{filename}.tar.gz".format(
+        fname = "{tmpdir}/{filename}".format(
             tmpdir=tempfile.gettempdir(),
             filename=TAR_GZ
         )
@@ -51,3 +59,6 @@ if __name__ == '__main__':
 
         with open(fname, 'wb') as f:
             f.write(r.content)
+
+        logging.info("Extracting {fname}...".format(fname=fname))
+        untar(fname)
