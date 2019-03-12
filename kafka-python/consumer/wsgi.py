@@ -9,6 +9,11 @@ import tempfile
 from kafka import KafkaConsumer
 
 
+# TODO:
+# parse JSON
+# send to insights advisor the message
+# remove JSON_FILE after parsed
+
 def untar(fname):
     tar = tarfile.open(fname)
     tar.extractall(path=tempfile.gettempdir())
@@ -55,7 +60,6 @@ if __name__ == '__main__':
         )
 
         logging.info("Writing {fname}...".format(fname=JSON_TAR_GZ))
-
         with open(JSON_TAR_GZ, 'wb') as f:
             f.write(r.content)
 
@@ -73,5 +77,7 @@ if __name__ == '__main__':
                  tmpdir=tempfile.gettempdir()),
             JSON_FILE
         )
+        logging.info("JSON available: {0}".format(JSON_FILE))
 
+        logging.info("Removing {0}".format(JSON_TAR_GZ))
         os.unlink(JSON_TAR_GZ)
