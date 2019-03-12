@@ -8,12 +8,10 @@ import tempfile
 
 from kafka import KafkaConsumer
 
-TAR_GZ = "rhv-log-collector-analyzer.tar.gz"
-
 
 def untar(fname):
     tar = tarfile.open(fname)
-    tar.extractall()
+    tar.extractall(path=tempfile.gettempdir())
     tar.close()
 
 
@@ -50,9 +48,10 @@ if __name__ == '__main__':
         except requests.exceptions.HTTPError as err:
             logging.exception(err)
 
-        fname = "{tmpdir}/{filename}".format(
+        fname = "{tmpdir}/{filename}-{rhaccount}.tar.gz".format(
             tmpdir=tempfile.gettempdir(),
-            filename=TAR_GZ
+            filename="rhv-log-collector-analyzer",
+            rhaccount=record['rh_account']
         )
 
         logging.info("Writing {fname}...".format(fname=fname))
@@ -62,3 +61,5 @@ if __name__ == '__main__':
 
         logging.info("Extracting {fname}...".format(fname=fname))
         untar(fname)
+
+        os.unlink(fname)
