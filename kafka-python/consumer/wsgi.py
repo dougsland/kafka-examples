@@ -48,7 +48,7 @@ if __name__ == '__main__':
         except requests.exceptions.HTTPError as err:
             logging.exception(err)
 
-        fname = "{tmpdir}/{filename}-{rhaccount}.tar.gz".format(
+        fname = "{tmpdir}/{filename}-rhaccount{rhaccount}.tar.gz".format(
             tmpdir=tempfile.gettempdir(),
             filename="rhv-log-collector-analyzer",
             rhaccount=record['rh_account']
