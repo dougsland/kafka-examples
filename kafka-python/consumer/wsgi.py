@@ -1,21 +1,53 @@
 #!/usr/bin/env python
 import os
+import json
 import logging
+import requests
+import tempfile
+
 from kafka import KafkaConsumer
-logging.basicConfig(level=logging.INFO)
 
-# Debug
-logging.info("Using BOOTSTRAP_SERVERS: %s" % (os.environ.get('BOOTSTRAP_SERVERS')))
-logging.info("Using CONSUME_TOPIC: %s" % (os.environ.get('CONSUME_TOPIC')))
+TAR_GZ = "rhv-log-collector-analyzer.tar.gz"
 
-# Setup Consumer
-logging.info("Initiating Kafka connection for Consumer...")
-consumer = KafkaConsumer(os.environ.get('CONSUME_TOPIC'),
-						 bootstrap_servers=os.environ.get('BOOTSTRAP_SERVERS'))
-logging.info("Kafka consumer:")
-logging.info(consumer)
+if __name__ == '__main__':
 
-# Consume things
-for msg in consumer:
-	logging.info("Receiving message:")
-	logging.info(msg)
+    logging.basicConfig(level=logging.INFO)
+
+    # Debug
+    logging.info(
+        "Using BOOTSTRAP_SERVERS: {btservers}"
+        "CONSUME_TOPIC: {consume_topic}".format(
+            btservers=os.environ.get('BOOTSTRAP_SERVERS'),
+            consume_topic=os.environ.get('CONSUME_TOPIC')
+        )
+    )
+
+    # Setup Consumer
+    logging.info("Initiating Kafka connection for Consumer...")
+    consumer = KafkaConsumer(
+         os.environ.get('CONSUME_TOPIC'),
+         bootstrap_servers=os.environ.get('BOOTSTRAP_SERVERS')
+    )
+    logging.info("Kafka consumer: {0}".format(consumer))
+
+    # Consume things
+    for msg in consumer:
+        logging.info("Receiving message:")
+        logging.info(msg)
+
+        record = json.loads(msg.value)
+        r = requests.get(record['url'])
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            logging.exception(err)
+
+        fname = "{tmpdir}/{filename}.tar.gz".format(
+            tmpdir=tempfile.gettempdir(),
+            filename=TAR_GZ
+        )
+
+        logging.info("Writing {fname}...".format(fname=fname))
+
+        with open(fname, 'wb') as f:
+            f.write(r.content)
