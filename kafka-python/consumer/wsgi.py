@@ -48,18 +48,30 @@ if __name__ == '__main__':
         except requests.exceptions.HTTPError as err:
             logging.exception(err)
 
-        fname = "{tmpdir}/{filename}-rhaccount{rhaccount}.tar.gz".format(
+        JSON_TAR_GZ = "{tmpdir}/{filename}-rhaccount{rhaccount}.tar.gz".format(
             tmpdir=tempfile.gettempdir(),
             filename="rhv-log-collector-analyzer",
             rhaccount=record['rh_account']
         )
 
-        logging.info("Writing {fname}...".format(fname=fname))
+        logging.info("Writing {fname}...".format(fname=JSON_TAR_GZ))
 
-        with open(fname, 'wb') as f:
+        with open(JSON_TAR_GZ, 'wb') as f:
             f.write(r.content)
 
-        logging.info("Extracting {fname}...".format(fname=fname))
-        untar(fname)
+        logging.info("Extracting {fname}...".format(fname=JSON_TAR_GZ))
+        untar(JSON_TAR_GZ)
 
-        os.unlink(fname)
+        # Renamed extracted JSON to show RH Account number
+        JSON_FILE = "{tmpdir}/rhv_log_collector_analyzer_{rh}.json".format(
+            tmpdir=tempfile.gettempdir(),
+            rh=record['rh_account']
+        )
+
+        os.rename(
+            "{tmpdir}/rhv_log_collector_analyzer.json".format(
+                 tempfile.gettempdir()),
+            JSON_FILE
+        )
+
+        os.unlink(JSON_TAR_GZ)
