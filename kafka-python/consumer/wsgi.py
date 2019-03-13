@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import os
 import json
+import os
 import logging
 import requests
 import tarfile
@@ -9,10 +9,35 @@ import tempfile
 from kafka import KafkaConsumer
 
 
+logging.basicConfig(level=logging.INFO)
+
 # TODO:
 # parse JSON
 # send to insights advisor the message
 # remove JSON_FILE after parsed
+
+
+def parse_json(jsonfile):
+    with open(jsonfile, 'r') as f:
+        json_file = f.read()
+
+    json_data = json.loads(json_file)
+
+    for data in json_data['rhv-log-collector-analyzer']:
+        logging.info("Description: {0}".format(data['description']))
+        logging.info("Knowledge Base: {0}".format(data['kb']))
+
+        for result in data['result']:
+            for info in result:
+                # Converting to string for now, Insights API might expect
+                # different data
+                logging.info(
+                    ', '.join("{0} {1}".format(
+                        key, val) for (key, val) in info.items())
+                )
+
+        logging.info("=========")
+
 
 def untar(fname):
     tar = tarfile.open(fname)
@@ -21,8 +46,6 @@ def untar(fname):
 
 
 if __name__ == '__main__':
-
-    logging.basicConfig(level=logging.INFO)
 
     # Debug
     logging.info(
@@ -78,6 +101,8 @@ if __name__ == '__main__':
             JSON_FILE
         )
         logging.info("JSON available: {0}".format(JSON_FILE))
+
+        parse_json(JSON_FILE)
 
         logging.info("Removing {0}".format(JSON_TAR_GZ))
         os.unlink(JSON_TAR_GZ)
