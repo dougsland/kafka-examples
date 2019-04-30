@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import base64
 import json
 import os
 import logging
@@ -39,6 +40,41 @@ def parse_json(jsonfile):
         logging.info("=========")
 
 
+def create_host(
+    account_number,
+    insights_id, bios_uuid,
+    fqdn, ip_addresses
+):
+    """
+    Create/Update host in the inventory
+    """
+    URL = "https://ci.cloud.paas.upshift.redhat.com/api/inventory/v1/hosts"
+
+    headers = {'Content-type': 'application/json'}
+    identity = {'identity': {'account_number': account_number}}
+    headers["x-rh-identity"] = base64.b64encode(json.dumps(identity).encode())
+    # headers["x-rh-insights-request-id"] = str(uuid.uuid4())
+
+    payload = {"account": account_number,
+               "insights_id": insights_id,
+               "bios_uuid": bios_uuid,
+               "fqdn": fqdn,
+               "display_name": fqdn,
+               "ip_addresses": ip_addresses}
+    # "subscription_manager_id": str(uuid.uuid4()),
+
+    logging.info("payload: {0}".format(payload))
+    json_payload = json.dumps([payload])
+    logging.info(json_payload)
+
+    r = requests.post(URL, data=json_payload, headers=headers, verify=False)
+    logging.info("response: {0}".format(r.text))
+    logging.info("status_code {0}".format(r.status_code))
+
+    results = json.loads(r.text)
+    logging.info(results["data"][0]["host"]["id"])
+
+
 def untar(fname):
     tar = tarfile.open(fname)
     tar.extractall(path=tempfile.gettempdir())
@@ -59,8 +95,8 @@ if __name__ == '__main__':
     # Setup Consumer
     logging.info("Initiating Kafka connection for Consumer...")
     consumer = KafkaConsumer(
-         os.environ.get('CONSUME_TOPIC'),
-         bootstrap_servers=os.environ.get('BOOTSTRAP_SERVERS')
+        os.environ.get('CONSUME_TOPIC'),
+        bootstrap_servers=os.environ.get('BOOTSTRAP_SERVERS')
     )
     logging.info("Kafka consumer: {0}".format(consumer))
 
@@ -70,6 +106,10 @@ if __name__ == '__main__':
         logging.info(msg)
 
         record = json.loads(msg.value)
+
+        metadata = json.loads(msg.value.metadata)
+        logging.info("metadata {0}".format(metadata))
+
         r = requests.get(record['url'])
         try:
             r.raise_for_status()
@@ -97,7 +137,7 @@ if __name__ == '__main__':
 
         os.rename(
             "{tmpdir}/rhv_log_collector_analyzer.json".format(
-                 tmpdir=tempfile.gettempdir()),
+                tmpdir=tempfile.gettempdir()),
             JSON_FILE
         )
         logging.info("JSON available: {0}".format(JSON_FILE))
