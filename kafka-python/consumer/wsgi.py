@@ -108,6 +108,7 @@ if __name__ == '__main__':
         record = json.loads(msg.value)
 
         logging.info("metadata {0}".format(record["metadata"]))
+        logging.info("bios_uuid {0}".format(record["metadata"]["bios_uuid"]))
 
         r = requests.get(record['url'])
         try:
