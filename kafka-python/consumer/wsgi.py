@@ -107,8 +107,7 @@ if __name__ == '__main__':
 
         record = json.loads(msg.value)
 
-        metadata = json.loads(msg.value.metadata)
-        logging.info("metadata {0}".format(metadata))
+        logging.info("metadata {0}".format(record["metadata"]))
 
         r = requests.get(record['url'])
         try:
