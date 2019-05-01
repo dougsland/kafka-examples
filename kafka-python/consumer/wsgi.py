@@ -7,7 +7,7 @@ import requests
 import tarfile
 import tempfile
 
-from kafka import KafkaConsumer
+from kafka import KafkaConsumer, KafkaProducer
 
 
 logging.basicConfig(level=logging.INFO)
