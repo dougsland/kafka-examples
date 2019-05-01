@@ -153,7 +153,7 @@ if __name__ == '__main__':
         )
 
         parse_json(JSON_FILE)
-        producer.send(os.environ.get('PRODUCE_TOPIC'), 'Hello consumer!')
+        #consumer.send(os.environ.get('PRODUCE_TOPIC'), 'Hello consumer!')
 
         logging.info("Removing {0}".format(JSON_TAR_GZ))
         os.unlink(JSON_TAR_GZ)
