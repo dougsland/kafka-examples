@@ -118,7 +118,7 @@ if __name__ == '__main__':
     )
     logging.info("Kafka consumer: {0}".format(consumer))
 
-    producer = KafkaProducer(bootstrap_servers=os.environ.get('BOOTSTRAP_SERVERS'))
+    producer = KafkaProducer(bootstrap_servers=os.environ.get('BOOTSTRAP_SERVERS'), request_timeout_ms=1000000, api_version_auto_timeout_ms=1000000)
     logging.info("Kafka producer: {0}".format(producer))
 
     # Consume things
