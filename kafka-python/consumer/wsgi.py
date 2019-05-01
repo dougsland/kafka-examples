@@ -53,6 +53,9 @@ def parse_json(jsonfile, host_id):
             hits.append({'rule_id': "CVE_2018_8897_kernel_popss|KERNEL_CVE_2018_8897_VULNERABLE_2", 'details': details})
             logging.info("=========")
 
+            # debug
+            return hits
+
     return hits
 
 
