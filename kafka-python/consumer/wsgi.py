@@ -151,6 +151,7 @@ if __name__ == '__main__':
             record["metadata"]["fqdn"],
             record["metadata"]["ip_addresses"],
         )
+        logging.info("host id: {0}".format(host_id))
 
         parse_json(JSON_FILE)
         #consumer.send(os.environ.get('PRODUCE_TOPIC'), 'Hello consumer!')
