@@ -51,7 +51,7 @@ def create_host(
     Create/Update host in the inventory
     """
     #URL = "https://ci.cloud.paas.upshift.redhat.com/api/inventory/v1/hosts"
-    URL = "insights-inventory.platform-ci.svc/api/inventory/v1/hosts"
+    URL = "https://insights-inventory.platform-ci.svc/api/inventory/v1/hosts"
 
     headers = {'Content-type': 'application/json'}
     identity = {'identity': {'account_number': account_number}}
