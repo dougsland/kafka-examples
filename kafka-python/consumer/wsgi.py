@@ -72,6 +72,7 @@ def create_host(
     json_payload = json.dumps([payload])
     logging.info(json_payload)
 
+    logging.info(URL)
     r = requests.post(URL, data=json_payload, headers=headers, verify=False)
     logging.info("response: {0}".format(r.text))
     logging.info("status_code {0}".format(r.status_code))
