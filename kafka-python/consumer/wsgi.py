@@ -18,13 +18,17 @@ logging.basicConfig(level=logging.INFO)
 # remove JSON_FILE after parsed
 
 
-def parse_json(jsonfile):
+def parse_json(jsonfile, host_id):
     with open(jsonfile, 'r') as f:
         json_file = f.read()
 
     json_data = json.loads(json_file)
 
+    hits = []
+
+    rule_id = 0
     for data in json_data['rhv-log-collector-analyzer']:
+
         logging.info("Description: {0}".format(data['description']))
         logging.info("Knowledge Base: {0}".format(data['kb']))
 
@@ -36,9 +40,10 @@ def parse_json(jsonfile):
                     ', '.join("{0} {1}".format(
                         key, val) for (key, val) in info.items())
                 )
-
+        hits.append({'rule_id': data['description'], 'details': data['result']})
         logging.info("=========")
 
+    return hits
 
 def create_host(
     account_number,
@@ -153,8 +158,22 @@ if __name__ == '__main__':
         )
         logging.info("host id: {0}".format(host_id))
 
-        parse_json(JSON_FILE)
-        #consumer.send(os.environ.get('PRODUCE_TOPIC'), 'Hello consumer!')
+        hits = parse_json(JSON_FILE, host_id)
+
+        logging.info("HITS: {0}".format(hits))
+
+        if hits:
+            output = {
+                'source': 'RHV',
+                'host_product': 'OCP',
+                'host_role': 'Cluster',
+                'inventory_id': host_id,
+                'account': record['rh_account'],
+                'hits': hits
+            }
+
+            logging.info("payload: {0}".format(output))
+            consumer.send(os.environ.get('PRODUCE_TOPIC'), output)
 
         logging.info("Removing {0}".format(JSON_TAR_GZ))
         os.unlink(JSON_TAR_GZ)
