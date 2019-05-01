@@ -185,7 +185,7 @@ if __name__ == '__main__':
             logging.info("payload: {0}".format(output))
             output = json.dumps(output).encode()
 
-            logging("JSON {0}".format(output))
+            logging.info("JSON {0}".format(output))
             producer.send(os.environ.get('PRODUCE_TOPIC'), output)
 
         logging.info("Removing {0}".format(JSON_TAR_GZ))
