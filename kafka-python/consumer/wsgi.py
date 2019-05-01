@@ -184,7 +184,7 @@ if __name__ == '__main__':
             }
 
             logging.info("payload: {0}".format(output))
-            consumer.send(os.environ.get('PRODUCE_TOPIC'), output)
+            producer.send(os.environ.get('PRODUCE_TOPIC'), output)
 
         logging.info("Removing {0}".format(JSON_TAR_GZ))
         os.unlink(JSON_TAR_GZ)
