@@ -42,7 +42,7 @@ def parse_json(jsonfile, host_id):
                             key, val) for (key, val) in info.items())
                     )
 
-            details.update = ({
+            details.update({
                 'description': data['description'],
                 'kb': data['kb'],
                 'result': data['result']
