@@ -50,13 +50,12 @@ def create_host(
     """
     Create/Update host in the inventory
     """
-    #URL = "https://ci.cloud.paas.upshift.redhat.com/api/inventory/v1/hosts"
     URL = "http://insights-inventory.platform-ci.svc:8080/api/inventory/v1/hosts"
+    # URL = "http://insights-inventory.platform-prod.svc:8080/api/inventory/v1/hosts"
 
     headers = {'Content-type': 'application/json'}
     identity = {'identity': {'account_number': account_number}}
     headers["x-rh-identity"] = base64.b64encode(json.dumps(identity).encode())
-    # headers["x-rh-insights-request-id"] = str(uuid.uuid4())
 
     payload = {
         "account": account_number,
@@ -66,7 +65,6 @@ def create_host(
         "display_name": fqdn,
         "ip_addresses": ip_addresses
     }
-    # "subscription_manager_id": str(uuid.uuid4()),
 
     logging.info("payload: {0}".format(payload))
     json_payload = json.dumps([payload])
@@ -78,7 +76,8 @@ def create_host(
     logging.info("status_code {0}".format(r.status_code))
 
     results = json.loads(r.text)
-    logging.info(results["data"][0]["host"]["id"])
+    return results["data"][0]["host"]["id"]
+
 
 
 def untar(fname):
@@ -145,15 +144,16 @@ if __name__ == '__main__':
         )
         logging.info("JSON available: {0}".format(JSON_FILE))
 
-        parse_json(JSON_FILE)
-
-        create_host(
+        host_id = create_host(
             record["rh_account"],
             record["metadata"]["insights_id"],
             record["metadata"]["bios_uuid"],
             record["metadata"]["fqdn"],
             record["metadata"]["ip_addresses"],
         )
+
+        parse_json(JSON_FILE)
+        producer.send(os.environ.get('PRODUCE_TOPIC'), 'Hello consumer!')
 
         logging.info("Removing {0}".format(JSON_TAR_GZ))
         os.unlink(JSON_TAR_GZ)
