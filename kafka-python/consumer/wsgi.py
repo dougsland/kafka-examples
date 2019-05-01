@@ -42,8 +42,10 @@ def parse_json(jsonfile):
 
 def create_host(
     account_number,
-    insights_id, bios_uuid,
-    fqdn, ip_addresses
+    insights_id,
+    bios_uuid,
+    fqdn,
+    ip_addresses
 ):
     """
     Create/Update host in the inventory
@@ -55,12 +57,14 @@ def create_host(
     headers["x-rh-identity"] = base64.b64encode(json.dumps(identity).encode())
     # headers["x-rh-insights-request-id"] = str(uuid.uuid4())
 
-    payload = {"account": account_number,
-               "insights_id": insights_id,
-               "bios_uuid": bios_uuid,
-               "fqdn": fqdn,
-               "display_name": fqdn,
-               "ip_addresses": ip_addresses}
+    payload = {
+        "account": account_number,
+        "insights_id": insights_id,
+        "bios_uuid": bios_uuid,
+        "fqdn": fqdn,
+        "display_name": fqdn,
+        "ip_addresses": ip_addresses
+    }
     # "subscription_manager_id": str(uuid.uuid4()),
 
     logging.info("payload: {0}".format(payload))
@@ -107,9 +111,6 @@ if __name__ == '__main__':
 
         record = json.loads(msg.value)
 
-        logging.info("metadata {0}".format(record["metadata"]))
-        logging.info("bios_uuid {0}".format(record["metadata"]["bios_uuid"]))
-
         r = requests.get(record['url'])
         try:
             r.raise_for_status()
@@ -143,6 +144,14 @@ if __name__ == '__main__':
         logging.info("JSON available: {0}".format(JSON_FILE))
 
         parse_json(JSON_FILE)
+
+        create_host(
+            record["rh_account"],
+            record["metadata"]["insights_id"],
+            record["metadata"]["bios_uuid"],
+            record["metadata"]["fqdn"],
+            record["metadata"]["ip_addresses"],
+        )
 
         logging.info("Removing {0}".format(JSON_TAR_GZ))
         os.unlink(JSON_TAR_GZ)
