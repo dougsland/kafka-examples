@@ -26,24 +26,33 @@ def parse_json(jsonfile, host_id):
 
     hits = []
 
-    rule_id = 0
     for data in json_data['rhv-log-collector-analyzer']:
 
         logging.info("Description: {0}".format(data['description']))
         logging.info("Knowledge Base: {0}".format(data['kb']))
 
-        for result in data['result']:
-            for info in result:
-                # Converting to string for now, Insights API might expect
-                # different data
-                logging.info(
-                    ', '.join("{0} {1}".format(
-                        key, val) for (key, val) in info.items())
-                )
-        hits.append({'rule_id': data['description'], 'details': data['result']})
-        logging.info("=========")
+        details = {}
+        if "WARNING" in data['type'] or "ERROR" in data['type']:
+            for result in data['result']:
+                for info in result:
+                    # Converting to string for now, Insights API might expect
+                    # different data
+                    logging.info(
+                        ', '.join("{0} {1}".format(
+                            key, val) for (key, val) in info.items())
+                    )
+
+            details.update = ({
+                'description': data['description'],
+                'kb': data['kb'],
+                'result': data['result']
+            })
+
+            hits.append({'rule_id': 'rhv' + data['id'], 'details': details})
+            logging.info("=========")
 
     return hits
+
 
 def create_host(
     account_number,
@@ -82,7 +91,6 @@ def create_host(
 
     results = json.loads(r.text)
     return results["data"][0]["host"]["id"]
-
 
 
 def untar(fname):
@@ -173,7 +181,7 @@ if __name__ == '__main__':
             }
 
             logging.info("payload: {0}".format(output))
-            consumer.send(os.environ.get('PRODUCE_TOPIC'), output)
+            # consumer.send(os.environ.get('PRODUCE_TOPIC'), output)
 
         logging.info("Removing {0}".format(JSON_TAR_GZ))
         os.unlink(JSON_TAR_GZ)
