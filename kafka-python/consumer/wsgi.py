@@ -180,7 +180,7 @@ if __name__ == '__main__':
 
         if hits:
             output = {
-                'source': 'RHV',
+                'source': 'rhvanalyzer',
                 'host_product': 'OCP',
                 'host_role': 'Cluster',
                 'inventory_id': host_id,
