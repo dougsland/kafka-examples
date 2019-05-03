@@ -50,7 +50,8 @@ def parse_json(jsonfile, host_id):
 
             #hits.append({'rule_id': 'rhv' + data['id'], 'details': details})
             # DEBUG ONLY
-            hits.append({'rule_id': "CVE_2018_8897_kernel_popss|KERNEL_CVE_2018_8897_VULNERABLE_2", 'details': details})
+            ruleid = data['name']
+            hits.append({'rule_id': ruleid + "|" + ruleid.upper(), 'details': details})
             logging.info("=========")
 
             # debug
