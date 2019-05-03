@@ -57,20 +57,7 @@ def parse_json(jsonfile, host_id):
             details.update({
                 'description': 'The following CPUs are deprecated in 4.3. If you have a cluster with one of these CPU families, you must change to another CPU family prior to upgrading the cluster',
                 'kb': '',
-                'result': "[
-                [
-                    {
-                        'CPU': 'Intel Conroe Family',
-                        'Cluster': 'Default'
-                    }
-                ],
-                [
-                    {
-                        'CPU': 'Intel Conroe Family',
-                        'Cluster': 'SuperCluster'
-                    }
-                ]
-            ]"
+                'result': '[[{"CPU": "Intel Conroe Family","Cluster": "Default"}],[{ "CPU": "Intel Conroe Family", "Cluster": "SuperCluster"}]]'
             })
             hits.append({'rule_id': "check_deprecated_CPUs_in_4_3|CHECK_DEPRECATED_CPUS_IN_4_3", 'details': details})
 
