@@ -50,8 +50,11 @@ def parse_json(jsonfile, host_id):
 
             #hits.append({'rule_id': 'rhv' + data['id'], 'details': details})
             # DEBUG ONLY
-            ruleid = data['name']
-            hits.append({'rule_id': ruleid + "|" + ruleid.upper(), 'details': details})
+
+            #ruleid = data['name']
+            #hits.append({'rule_id': ruleid + "|" + ruleid.upper(), 'details': details})
+            hits.append({'rule_id': "check_deprecated_CPUs_in_4_3|CHECK_DEPRECATED_CPUS_IN_4_3", 'details': details})
+
             logging.info("=========")
 
             # debug
