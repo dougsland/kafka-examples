@@ -43,12 +43,12 @@ def parse_json(jsonfile, host_id):
                     )
 
             # DEBUG ONLY
-            if data['name'] == "check_deprecated_CPUs_in_4_3":
-                details.update({
-                    'description': data['description'],
-                    'kb': data['kb'],
-                    'result': data['result']
-                })
+            #if data['name'] == "check_deprecated_CPUs_in_4_3":
+            #    details.update({
+            #        'description': data['description'],
+            #        'kb': data['kb'],
+            #        'result': data['result']
+            #    })
 
                 ruleid = data['name']
                 hits.append({'rule_id': ruleid + "|" + ruleid.upper(), 'details': details})
