@@ -12,11 +12,6 @@ from kafka import KafkaConsumer, KafkaProducer
 
 logging.basicConfig(level=logging.INFO)
 
-# TODO:
-# parse JSON
-# send to insights advisor the message
-# remove JSON_FILE after parsed
-
 
 def parse_json(jsonfile, host_id):
     with open(jsonfile, 'r') as f:
