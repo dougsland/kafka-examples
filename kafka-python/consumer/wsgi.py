@@ -33,14 +33,15 @@ def parse_json(jsonfile, host_id):
 
         details = {}
         if "WARNING" in data['type'] or "ERROR" in data['type']:
-            for result in data['result']:
-                for info in result:
+            # DEBUG
+            # for result in data['result']:
+            #    for info in result:
                     # Converting to string for now, Insights API might expect
                     # different data
-                    logging.info(
-                        ', '.join("{0} {1}".format(
-                            key, val) for (key, val) in info.items())
-                    )
+            #        logging.info(
+            #            ', '.join("{0} {1}".format(
+            #                key, val) for (key, val) in info.items())
+            #        )
 
             # DEBUG ONLY
             #if data['name'] == "check_deprecated_CPUs_in_4_3":
