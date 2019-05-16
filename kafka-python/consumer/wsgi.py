@@ -7,10 +7,28 @@ import requests
 import tarfile
 import tempfile
 
+try:
+    import configparser as ConfigParser
+except ImportError:
+    from ConfigParser import ConfigParser
+
 from kafka import KafkaConsumer, KafkaProducer
 
 
 logging.basicConfig(level=logging.INFO)
+
+
+def read_config(filename):
+    """
+    Read configuration and return config obj
+    """
+
+    if os.path.exists(filename):
+        config = ConfigParser()
+        config.read(filename)
+        return config
+
+    raise RuntimeError("Can't find conf: {0}".format(filename))
 
 
 def parse_json(jsonfile, host_id):
@@ -21,10 +39,25 @@ def parse_json(jsonfile, host_id):
 
     hits = []
 
+    config = read_config(
+        "/etc/ovirt-engine/rhv-log-collector-analyzer/"
+        "rhv-log-collector-analyzer.conf"
+    )
+
     for data in json_data['rhv-log-collector-analyzer']:
 
         logging.info("Description: {0}".format(data['description']))
         logging.info("Knowledge Base: {0}".format(data['kb']))
+
+        try:
+            if config.get('insights', 'disabled-check') in data['name']:
+                logging.info(
+                    "disabled-check skipping {0} check".format(data['name'])
+                )
+                continue
+        except:
+            # TODO: Support python2 and python3 configparser exception NoOptionError
+            pass
 
         details = {}
         if "WARNING" in data['type'] or "ERROR" in data['type']:
@@ -39,7 +72,8 @@ def parse_json(jsonfile, host_id):
             #        )
 
             # DEBUG ONLY
-            #if data['name'] == "check_deprecated_CPUs_in_4_3":
+            # if data['name'] == "check_deprecated_CPUs_in_4_3":
+
             details.update({
                 'description': data['description'],
                 'kb': data['kb'],
@@ -47,15 +81,11 @@ def parse_json(jsonfile, host_id):
             })
 
             ruleid = data['name']
-            hits.append({'rule_id': ruleid + "|" + ruleid.upper(), 'details': details})
-
-            # DEBUG ONLY
-            #hits.append({'rule_id': "check_deprecated_CPUs_in_4_3|CHECK_DEPRECATED_CPUS_IN_4_3", 'details': details})
+            hits.append(
+                {'rule_id': ruleid + "|" + ruleid.upper(), 'details': details}
+            )
 
             logging.info("=========")
-
-                # debug
-                #return hits
 
     return hits
 
@@ -124,7 +154,12 @@ if __name__ == '__main__':
     )
     logging.info("Kafka consumer: {0}".format(consumer))
 
-    producer = KafkaProducer(bootstrap_servers=os.environ.get('BOOTSTRAP_SERVERS'), request_timeout_ms=1000000, api_version_auto_timeout_ms=1000000)
+    producer = KafkaProducer(bootstrap_servers=os.environ.get(
+        'BOOTSTRAP_SERVERS'))
+
+    # DEBUG ONLY
+    # , request_timeout_ms=1000000, api_version_auto_timeout_ms=1000000)
+
     logging.info("Kafka producer: {0}".format(producer))
 
     # Consume things
